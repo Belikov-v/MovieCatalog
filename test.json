@@ -1,0 +1,16 @@
+[
+  {
+    "Id": 0,
+    "Name": "dsdwd",
+    "Genre": 0,
+    "ReleaseYear": 2006,
+    "Rating": 10
+  },
+  {
+    "Id": 1,
+    "Name": "sdsd",
+    "Genre": 0,
+    "ReleaseYear": 2000,
+    "Rating": 10
+  }
+]

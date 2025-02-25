@@ -1,0 +1,11 @@
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Debug/net8.0/MovieCatalogLibrary.deps.json
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Debug/net8.0/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Debug/net8.0/MovieCatalogLibrary.pdb
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.AssemblyInfoInputs.cache
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.AssemblyInfo.cs
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.csproj.CoreCompileInputs.cache
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/refint/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/MovieCatalogLibrary.pdb
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Debug/net8.0/ref/MovieCatalogLibrary.dll
