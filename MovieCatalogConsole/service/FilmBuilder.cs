@@ -1,4 +1,6 @@
 using MovieCatalogLibrary.model;
+using Spectre.Console;
+using System.Text;
 
 namespace MovieCatalogConsole.service;
 
@@ -14,11 +16,15 @@ public static class FilmBuilder
     /// </summary>
     public static Film BuildFilm()
     {
-        Film film = new Film();
+        var film = new Film();
         SetName(film);
         SetGenre(film);
         SetReleaseYear(film);
         SetRating(film);
+        SetDirector(film);
+        SetPlot(film);
+        SetActors(film); // Добавляем актеров.
+
         return film;
     }
 
@@ -31,7 +37,7 @@ public static class FilmBuilder
         while (true) // Бесконечный цикл для повторного запроса в случае ошибки.
         {
             Console.WriteLine("Введите название фильма.");
-            string name = Console.ReadLine() ?? string.Empty; // Чтение ввода пользователя.
+            var name = Console.ReadLine() ?? string.Empty; // Чтение ввода пользователя.
             try
             {
                 if (string.IsNullOrWhiteSpace(name))
@@ -41,7 +47,55 @@ public static class FilmBuilder
             }
             catch (ArgumentException e)
             {
-                Console.WriteLine($"Ошибка: {e.Message} (Детали: {e.Message})");
+                Console.WriteLine($"Ошибка: {e.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Метод для установки имени режиссера фильма.
+    /// Запрашивает у пользователя ввод и проверяет, что имя не пустое.
+    /// </summary>
+    private static void SetDirector(Film film)
+    {
+        while (true) // Бесконечный цикл для повторного запроса в случае ошибки.
+        {
+            Console.WriteLine("Введите имя режиссера фильма.");
+            var name = Console.ReadLine() ?? string.Empty; // Чтение ввода пользователя.
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name) || int.TryParse(name, out _) || double.TryParse(name, out _))
+                    throw new ArgumentException("Введенное имя некорректно.");
+                film.Director = name;
+                break; // Выход из цикла, если ввод корректен.
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine($"Ошибка: {e.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Метод для установки сюжета фильма.
+    /// Запрашивает у пользователя ввод и проверяет, что сюжет не пустой.
+    /// </summary>
+    private static void SetPlot(Film film)
+    {
+        while (true) // Бесконечный цикл для повторного запроса в случае ошибки.
+        {
+            Console.WriteLine("Введите сюжет фильма.");
+            var name = Console.ReadLine() ?? string.Empty; // Чтение ввода пользователя.
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentException("Введенные данные некорректны.");
+                film.Plot = name;
+                break; // Выход из цикла, если ввод корректен.
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine($"Ошибка: {e.Message}");
             }
         }
     }
@@ -116,45 +170,60 @@ public static class FilmBuilder
     /// Метод для установки жанра фильма.
     /// Запрашивает у пользователя выбор жанра из списка и проверяет, что выбор корректен.
     /// </summary>
-    public static void SetGenre(Film film)
+    private static void SetGenre(Film film)
     {
-        Console.WriteLine("Выберите жанр фильма:");
-        var genres = Enum.GetValues(typeof(GenreOfFilm)); // Получаем все значения перечисления GenreOfFilm.
+        // Получаем все значения перечисления GenreOfFilm
+        var genres = Enum.GetValues(typeof(GenreOfFilm));
 
-        // Выводим список жанров с номерами для выбора.
-        for (int i = 0; i < genres.Length; i++)
+        // Создаем список жанров для выбора
+        var genreOptions = genres.Cast<object>().Select((t, i) => $"{i + 1}. {genres.GetValue(i)}").ToList();
+
+        // Отображаем интерактивное меню
+        var selectedGenre = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Выберите жанр фильма:")
+                .PageSize(10) // Указываем количество пунктов на экране
+                .AddChoices(genreOptions)
+        );
+
+        // Извлекаем номер выбранного жанра
+        var choice = int.Parse(selectedGenre.Split('.')[0]);
+
+        // Устанавливаем выбранный жанр
+        film.Genre = (GenreOfFilm)genres.GetValue(choice - 1)!;
+    }
+
+    /// <summary>
+    /// Метод для добавления актеров в фильм.
+    /// Запрашивает у пользователя список актеров и добавляет их в объект Film.
+    /// </summary>
+    private static void SetActors(Film film)
+    {
+        var actors = new List<string>();
+        Console.WriteLine("Введите имена актеров (для завершения введите пустую строку):");
+
+        while (true)
         {
-            Console.WriteLine($"{i + 1}. {genres.GetValue(i)}");
+            Console.Write("Актер: ");
+            var actor = Console.ReadLine()?.Trim(); // Чтение ввода пользователя.
+
+            // Если введена пустая строка, завершаем ввод.
+            if (string.IsNullOrWhiteSpace(actor))
+            {
+                if (actors.Count == 0)
+                {
+                    Console.WriteLine("Должен быть указан хотя бы один актер.");
+                    continue;
+                }
+
+                break;
+            }
+
+            // Добавляем актера в список.
+            actors.Add(actor);
         }
 
-        while (true) // Бесконечный цикл для повторного запроса в случае ошибки.
-        {
-            Console.Write("Введите номер жанра: ");
-            string input = Console.ReadLine() ?? string.Empty; // Чтение ввода пользователя.
-
-            try
-            {
-                int choice = int.Parse(input); // Преобразование строки в целое число.
-                Object genre = genres.GetValue(choice - 1) ?? throw new ArgumentException(); // Получаем выбранный жанр.
-                film.Genre = (GenreOfFilm)genre;
-                break; // Выход из цикла, если ввод корректен.
-            }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine($"Ошибка: Некорректный аргумент. (Детали: {e.Message})");
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                Console.WriteLine($"Ошибка: Введен недопустимый индекс. (Детали: {e.Message})");
-            }
-            catch (FormatException e)
-            {
-                Console.WriteLine($"Ошибка: Некорректный формат ввода. (Детали: {e.Message})");
-            }
-            catch (OverflowException e)
-            {
-                Console.WriteLine($"Ошибка: Введенное значение выходит за допустимые пределы. (Детали: {e.Message})");
-            }
-        }
+        // Устанавливаем список актеров в объект Film.
+        film.Actors = actors;
     }
 }

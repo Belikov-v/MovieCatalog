@@ -1,220 +1,174 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using MovieCatalogConsole.service;
 using MovieCatalogLibrary.model;
-using MovieCatalogLibrary.service;
+using MovieCatalogLibrary.service.parsers;
+using Spectre.Console;
 
+/*
+ * Беликов Владимир
+ * БПИ249-2
+ * Вариант: 8 (часть B)
+ */
 namespace MovieCatalogConsole;
 
-public class Program
+/// <summary>
+/// Класс с точкой входа в приложение.
+/// </summary>
+public static class Program
 {
-    private static readonly IFilmManager FilmManager = new InMemoryFilmManager();
-    private static string _path = String.Empty;
+    private static string _path = string.Empty; // Путь к файлу с данными.
+    private static Timer? _timer; // Таймер для автоматического обновления данных.
 
-    private static readonly Dictionary<int, (string Description, Action Action)> MenuItems = new()
+    // Словарь пунктов меню с описанием и действиями.
+    private static readonly Dictionary<string, (string Description, Action Action)> MenuItems = new()
     {
-        { 1, ("Просмотра всех фильмов.", GetAllFilms) },
-        { 2, ("Добавления нового фильма.", AddFilm) },
-        { 3, ("Редактирования рейтинга фильма.", EditRatingFilm) },
-        { 4, ("Удаления фильма.", DeleteFilm) },
-        { 5, ("Выход.", Exit) }
+        { "1", ("Просмотр всех фильмов.", FilmOperator.DisplayAllFilms) },
+        { "2", ("Добавление собственного фильма.", FilmOperator.AddFilm) },
+        { "3", ("Редактирование рейтинга фильма.", FilmOperator.EditRatingFilm) },
+        { "4", ("Удаление фильма.", FilmOperator.DeleteFilm) },
+        { "5", ("Представить в виде таблицы список фильмов.", FilmOperator.DisplayTable) },
+        { "6", ("Диаграмма распределения фильмов по жанрам и рейтингам.", FilmOperator.DisplayСhart) },
+        { "7", ("Визуализация обложек фильмов.", FilmOperator.DisplayCarousel) },
+        { "8", ("Просмотр фильма.", FilmOperator.GetFilm) },
+        { "9", ("Рекомендации.", FilmOperator.DisplayRecommendations) },
+        { "10", ("Обновить данные.", () => FilmOperator.UpdateData(null)) },
+        { "11", ("Сформировать график распределения рейтингов по жанрам в файл.", FilmOperator.DisplayRatingByGenre) },
+        { "12", ("Сформировать график распределения рейтингов фильмов в файл.", FilmOperator.DisplayRatingHistogram) },
+        { "13", ("Добавление фильма по названию.", FilmOperator.AddExistingFilm) },
+        { "14", ("Выход.", Exit) }
     };
 
-    public static void Main(string[] args)
+    /// <summary>
+    /// Точка входа в приложение.
+    /// </summary>
+    public static void Main()
     {
-        Load();
-        ShowMenu();
+        Load(); // Загрузка данных из файла.
+        _timer = new Timer(FilmOperator.UpdateData, null, 0, 300000); // Запуск таймера для обновления данных.
+        ShowMenu(); // Отображение главного меню.
     }
 
-    private static void Default()
-    {
-    }
-
-    private static void GetAllFilms()
-    {
-        StringBuilder stringBuilder = new StringBuilder($"Каталог фильмов:");
-
-        foreach (var film in FilmManager.GetAllFilms())
-        {
-            stringBuilder.Append($"\n {new string('-', 20)} \n");
-            stringBuilder.Append(film);
-            stringBuilder.Append($"\n {new string('-', 20)} \n");
-        }
-
-        Console.WriteLine(stringBuilder.ToString());
-    }
-
-    private static void EditRatingFilm()
-    {
-        int id = GetIdFilm();
-        Film film = FilmManager.GetFilm(id);
-        FilmBuilder.SetRating(film);
-        FilmManager.EditFilm(film);
-    }
-
-    private static void DeleteFilm()
-    {
-        int id = GetIdFilm();
-        FilmManager.DeleteFilm(id);
-    }
-
-
-    private static int GetIdFilm()
-    {
-        while (true)
-        {
-            Console.WriteLine("Введите id фильма.");
-            try
-            {
-                int id = int.Parse(Console.ReadLine() ?? throw new ArgumentNullException());
-                if (!FilmManager.IsIdExist(id)) throw new KeyNotFoundException();
-                return id;
-            }
-            catch (FormatException e)
-            {
-                Console.WriteLine($"Ошибка: Некорректный формат ввода. (Детали: {e.Message})");
-            }
-            catch (ArgumentNullException e)
-            {
-                Console.WriteLine($"Ошибка: Входное значение не может быть null. (Детали: {e.Message})");
-            }
-            catch (OverflowException e)
-            {
-                Console.WriteLine($"Ошибка: Введенное значение выходит за допустимые пределы. (Детали: {e.Message})");
-            }
-            catch (KeyNotFoundException e)
-            {
-                Console.WriteLine($"Ошибка: Запрашиваемый ключ не найден. (Детали: {e.Message})");
-            }
-        }
-    }
-
-    private static void AddFilm()
-    {
-        Film film = FilmBuilder.BuildFilm();
-        FilmManager.AddFilm(film);
-    }
-
+    /// <summary>
+    /// Отображает главное меню и обрабатывает выбор пользователя.
+    /// </summary>
     private static void ShowMenu()
     {
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("Меню:");
+
+            // Создаем список пунктов меню для выбора.
+            var menuOptions = new List<string>();
             foreach (var item in MenuItems)
             {
-                Console.WriteLine($"{item.Key}. {item.Value.Description}");
+                menuOptions.Add($"{item.Key}. {item.Value.Description}");
             }
 
-            Console.WriteLine("Выберите пункт меню: ");
-            if (int.TryParse(Console.ReadLine(), out int choice) && MenuItems.TryGetValue(choice, out var menuItem))
+            // Отображаем интерактивное меню.
+            string selectedOption = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Выберите пункт меню:")
+                    .PageSize(14)
+                    .AddChoices(menuOptions)
+            );
+
+            // Извлекаем ключ выбранного пункта меню.
+            string selectedKey = selectedOption.Split('.')[0];
+
+            if (MenuItems.TryGetValue(selectedKey, out var menuItem))
             {
                 Console.Clear();
-                menuItem.Action.Invoke();
+                menuItem.Action.Invoke(); // Выполняем выбранное действие.
             }
             else
             {
-                Console.WriteLine("Неверный выбор.");
+                AnsiConsole.MarkupLine("[red]Неверный выбор.[/]");
             }
 
-            Console.WriteLine("\nНажмите любую клавишу, чтобы вернуться в меню...");
+            AnsiConsole.MarkupLine("\n[green]Нажмите любую клавишу, чтобы вернуться в меню...[/]");
             Console.ReadKey();
         }
     }
 
-
+    /// <summary>
+    /// Загружает данные о фильмах из файла.
+    /// </summary>
     private static void Load()
     {
         while (true)
         {
-            _path = FileManager.GetPathToFile();
+            _path = FileDataProvider.GetPathToFile(); // Получаем путь к файлу.
             try
             {
-                IEnumerable<Film> films = FileManager.ReadFile(_path);
+                IEnumerable<Film> films = FileDataProvider.ReadFile(_path); // Чтение данных из файла.
                 foreach (var film in films)
                 {
-                    FilmManager.AddFilm(film);
+                    FilmOperator.AddFilmToStorage(film); // Добавление фильмов в хранилище.
                 }
 
-                return;
+                return; // Выход из цикла после успешной загрузки.
             }
-
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Ошибка: Файл не найден.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка: Файл не найден.[/]");
             }
-
             catch (IOException)
             {
-                Console.WriteLine("Ошибка ввода-вывода.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка ввода-вывода.[/]");
             }
-
-
             catch (JsonException)
             {
-                Console.WriteLine("Ошибка при десериализации JSON.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка при десериализации JSON.[/]");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{e.Message} Попробуйте загрузить в другой файл.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine($"[red]{e.Message} Попробуйте загрузить в другой файл.[/]");
             }
         }
     }
 
+    /// <summary>
+    /// Завершает работу приложения с сохранением данных.
+    /// </summary>
     private static void Exit()
     {
-        List<Film> films = FilmManager.GetAllFilms().ToList();
+        var films = FilmOperator.GetAllFilmsFromStorage(); // Получаем все фильмы из хранилища.
         while (true)
         {
             try
             {
-                string json = JsonParser.FilmsToJson(films);
-                FileManager.WriteDateInFile(_path, json);
-                Environment.Exit(0);
+                string json = JsonParser.FilmsToJson(films); // Сериализуем фильмы в JSON.
+                FileDataProvider.WriteDateInFile(_path, json); // Записываем данные в файл.
+                Environment.Exit(0); // Завершаем работу приложения.
                 return;
             }
             catch (NotSupportedException)
             {
-                Console.WriteLine("Невозможно десериализовать JSON: тип не поддерживается.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Невозможно десериализовать JSON: тип не поддерживается.[/]");
             }
             catch (ArgumentException)
             {
-                Console.WriteLine("Ошибка: Неверные символы.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка: Неверные символы.[/]");
             }
             catch (UnauthorizedAccessException)
             {
-                Console.WriteLine("Ошибка: Нет доступа к файлу.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка: Нет доступа к файлу.[/]");
             }
-
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Ошибка: Файл не найден.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка: Файл не найден.[/]");
             }
-
             catch (IOException)
             {
-                Console.WriteLine("Ошибка ввода-вывода.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка ввода-вывода.[/]");
             }
-
-
             catch (JsonException)
             {
-                Console.WriteLine("Ошибка при десериализации JSON.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine("[red]Ошибка при десериализации JSON.[/]");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{e.Message} Попробуйте загрузить в другой файл.");
-                _path = FileManager.GetPathToFile();
+                AnsiConsole.MarkupLine($"[red]{e.Message} Попробуйте загрузить в другой файл.[/]");
             }
         }
     }

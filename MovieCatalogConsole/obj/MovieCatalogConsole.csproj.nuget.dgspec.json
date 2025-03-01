@@ -46,6 +46,24 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "ScottPlot": {
+              "target": "Package",
+              "version": "[5.0.54, )"
+            },
+            "SkiaSharp": {
+              "target": "Package",
+              "version": "[3.118.0-preview.2.3, )"
+            },
+            "Spectre.Console": {
+              "target": "Package",
+              "version": "[0.49.2-preview.0.76, )"
+            },
+            "Spectre.Console.ImageSharp": {
+              "target": "Package",
+              "version": "[0.49.2-preview.0.76, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -104,6 +122,28 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "ScottPlot": {
+              "target": "Package",
+              "version": "[5.0.54, )"
+            },
+            "SkiaSharp": {
+              "target": "Package",
+              "version": "[3.118.0-preview.2.3, )"
+            },
+            "Spectre.Console": {
+              "target": "Package",
+              "version": "[0.49.2-preview.0.76, )"
+            },
+            "Spectre.Console.ImageSharp": {
+              "target": "Package",
+              "version": "[0.49.2-preview.0.76, )"
+            },
+            "Spectrum": {
+              "target": "Package",
+              "version": "[0.1.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
