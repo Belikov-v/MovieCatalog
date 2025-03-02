@@ -1,0 +1,13 @@
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Release/net8.0/osx-x64/MovieCatalogLibrary.deps.json
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Release/net8.0/osx-x64/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/bin/Release/net8.0/osx-x64/MovieCatalogLibrary.pdb
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.csproj.AssemblyReference.cache
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.AssemblyInfoInputs.cache
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.AssemblyInfo.cs
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.csproj.CoreCompileInputs.cache
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.sourcelink.json
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/refint/MovieCatalogLibrary.dll
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/MovieCatalogLibrary.pdb
+/Users/macbook/RiderProjects/MovieCatalog/MovieCatalogLibrary/obj/Release/net8.0/osx-x64/ref/MovieCatalogLibrary.dll
